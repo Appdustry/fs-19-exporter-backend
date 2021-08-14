@@ -54,9 +54,11 @@ export class SavegamesController {
   }
 
   @Get('/invitecodes/:inviteCode')
-  @ApiFoundResponse()
+  @ApiFoundResponse({ type: SavegameDto })
   @ApiNotFoundResponse()
-  getOneByInviteCode(@Param('inviteCode') inviteCode: string) {}
+  getOneByInviteCode(@Param('inviteCode') inviteCode: string) {
+    return this.savegamesService.findOneByInviteCode(inviteCode);
+  }
 
   @Get(':id')
   @ApiFoundResponse({ type: SavegameDto })

@@ -2,6 +2,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -42,8 +43,13 @@ export class SavegamesService {
     return this.repo.findOne(saved.id);
   }
 
-  findOneByInviteCode(inviteCode: string) {
-    return this.repo.find({ where: { inviteCode } });
+  async findOneByInviteCode(inviteCode: string) {
+    const savegame = await this.repo.find({ where: { inviteCode } });
+    if (!savegame) {
+      throw new NotFoundException();
+    }
+
+    return savegame;
   }
 
   findAll() {
