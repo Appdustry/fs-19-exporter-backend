@@ -1,10 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreatePriceHistoryDto } from '../price-histories/dto/create-price-history.dto';
-import { PriceHistory } from '../price-histories/entities/price-history.entity';
 import { Savegame } from '../savegames/entities/savegame.entity';
-import { SellStation } from '../sell-stations/entities/sell-station.entity';
 import { CreateFillTypeDto } from './dto/create-fill-type.dto';
 import { FillType } from './entities/fill-type.entity';
 
@@ -16,9 +13,6 @@ export class FillTypesService {
 
     @InjectRepository(Savegame)
     private readonly savegame: Repository<Savegame>,
-
-    @InjectRepository(PriceHistory)
-    private readonly priceHistory: Repository<PriceHistory>,
   ) {}
   findForSavegame(savegameId: string) {
     return this.repo.find({ where: { savegameId: savegameId } });
@@ -43,81 +37,81 @@ export class FillTypesService {
       if (!exists) {
         exists = await this.repo.save(updatedType);
       }
-      await this.setPriceHistoryForType(exists.id, updatedType.priceHistory);
+      // await this.setPriceHistoryForType(exists.id, updatedType.priceHistory);
     }
 
     return this.savegame.findOne(savegameId, { relations: ['fillTypes'] });
   }
 
-  private async setPriceHistoryForType(
-    typeId: string,
-    priceHistory: CreatePriceHistoryDto[],
-  ) {
-    const type = await this.repo.findOne(typeId, {
-      relations: ['priceHistory'],
-    });
-    if (!type) {
-      return;
-    }
-    const newEntries: CreatePriceHistoryDto[] = [];
-    for (const createHistory of priceHistory) {
-      if (
-        !type.priceHistory.find(
-          (exisiting) =>
-            exisiting.day === createHistory.day &&
-            exisiting.time === createHistory.time,
-        )
-      ) {
-        newEntries.push(createHistory);
-      }
-    }
-    newEntries.sort((a, b) => {
-      if (a.day - b.day !== 0) {
-        return a.day - b.day;
-      }
-      return a.time - b.time;
-    });
-    await this.priceHistory.save(newEntries);
-  }
+  // private async setPriceHistoryForType(
+  //   typeId: string,
+  //   priceHistory: CreatePriceHistoryDto[],
+  // ) {
+  //   const type = await this.repo.findOne(typeId, {
+  //     relations: ['priceHistory'],
+  //   });
+  //   if (!type) {
+  //     return;
+  //   }
+  //   const newEntries: CreatePriceHistoryDto[] = [];
+  //   for (const createHistory of priceHistory) {
+  //     if (
+  //       !type.priceHistory.find(
+  //         (exisiting) =>
+  //           exisiting.day === createHistory.day &&
+  //           exisiting.time === createHistory.time,
+  //       )
+  //     ) {
+  //       newEntries.push(createHistory);
+  //     }
+  //   }
+  //   newEntries.sort((a, b) => {
+  //     if (a.day - b.day !== 0) {
+  //       return a.day - b.day;
+  //     }
+  //     return a.time - b.time;
+  //   });
+  //   await this.priceHistory.save(newEntries);
+  // }
 
-  public async pushPricesForType(
-    savegameId: string,
-    fillTypeIndex: string,
-    priceData: CreatePriceHistoryDto[],
-  ) {
-    const fillType = await this.repo.findOne({
-      where: { savegameId, fillTypeIndex },
-    });
-    if (!fillType) {
-      throw new NotFoundException();
-    }
+  // public async pushPricesForType(
+  //   savegameId: string,
+  //   fillTypeIndex: string,
+  //   priceData: CreatePriceHistoryDto[],
+  // ) {
+  //   const fillType = await this.repo.findOne({
+  //     where: { savegameId, fillTypeIndex },
+  //   });
+  //   if (!fillType) {
+  //     throw new NotFoundException();
+  //   }
 
-    let lowOrHighChange = false;
-    let low = fillType.priceLow;
-    let high = fillType.priceHigh;
+  //   let lowOrHighChange = false;
+  //   let low = fillType.priceLow;
+  //   let high = fillType.priceHigh;
 
-    fillType.priceHistory = [];
+  //   fillType.currentPrices = [];
 
-    for (const price of priceData) {
-      if (price.price < low) {
-        low = price.price;
-        lowOrHighChange = true;
-      } else if (price.price > high) {
-        high = price.price;
-        lowOrHighChange = true;
-      }
-      fillType.priceHistory.push(
-        await this.priceHistory.save({
-          fillTypeId: fillType.id,
-          ...price,
-        }),
-      );
-    }
+  //   for (const price of priceData) {
+  //     if (price.price < low) {
+  //       low = price.price;
+  //       lowOrHighChange = true;
+  //     } else if (price.price > high) {
+  //       high = price.price;
+  //       lowOrHighChange = true;
+  //     }
+  //     fillType.priceHistory.push(
+  //       await this.priceHistory.save({
+  //         fillTypeId: fillType.id,
+  //         ...price,
+  //       }),
+  //     );
+  //   }
 
-    if (lowOrHighChange) {
-      await this.repo.save({ id: fillType.id, priceHigh: high, priceLow: low });
-    }
+  //   if (lowOrHighChange) {
+  //     await this.repo.save({ id: fillType.id, priceHigh: high, priceLow: low });
+  //   }
 
-    return fillType.priceHistory;
-  }
+  //   return fillType.priceHistory;
+  // }
 }

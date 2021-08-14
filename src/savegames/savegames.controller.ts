@@ -118,16 +118,16 @@ export class SavegamesController {
     return this.fillTypeService.createOne({ savegameId, ...data });
   }
 
-  @Patch(':id/filltypes/index/:index/prices')
-  pushFillTypePrice(
-    @Param('id') savegameId: string,
-    @Param('index') fillTypeIndex: string,
-    @Body() prices: CreatePriceHistoryDto[],
-  ) {
-    return this.fillTypeService.pushPricesForType(
-      savegameId,
-      fillTypeIndex,
-      prices,
-    );
-  }
+  // @Patch(':id/filltypes/index/:index/prices')
+  // pushFillTypePrice(
+  //   @Param('id') savegameId: string,
+  //   @Param('index') fillTypeIndex: string,
+  //   @Body() prices: CreatePriceHistoryDto[],
+  // ) {
+  //   return this.fillTypeService.pushPricesForType(
+  //     savegameId,
+  //     fillTypeIndex,
+  //     prices,
+  //   );
+  // }
 }
