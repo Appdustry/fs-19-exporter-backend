@@ -42,6 +42,10 @@ export class SavegamesService {
     return this.repo.findOne(saved.id);
   }
 
+  findOneByInviteCode(inviteCode: string) {
+    return this.repo.find({ where: { inviteCode } });
+  }
+
   findAll() {
     return this.repo.find({ where: { ownerId: this.req.user } });
   }

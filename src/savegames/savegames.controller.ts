@@ -19,7 +19,6 @@ import {
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { FillTypesService } from '../fill-types/fill-types.service';
@@ -53,6 +52,11 @@ export class SavegamesController {
   findAll() {
     return this.savegamesService.findAll();
   }
+
+  @Get('/invitecodes/:inviteCode')
+  @ApiFoundResponse()
+  @ApiNotFoundResponse()
+  getOneByInviteCode(@Param('inviteCode') inviteCode: string) {}
 
   @Get(':id')
   @ApiFoundResponse({ type: SavegameDto })
