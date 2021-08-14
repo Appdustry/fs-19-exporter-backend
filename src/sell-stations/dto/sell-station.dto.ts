@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { CurrentPriceDto } from '../../current-prices/dto/current-price.dto';
 import { PriceHistoryDto } from '../../price-histories/dto/price-history.dto';
 import { SavegameDto } from '../../savegames/dto/savegame.dto';
 
@@ -15,6 +16,6 @@ export class SellStationDto {
   @ApiPropertyOptional({ type: () => SavegameDto })
   savegame?: SavegameDto;
 
-  @ApiPropertyOptional({ isArray: true, type: () => PriceHistoryDto })
-  priceHistories?: PriceHistoryDto[];
+  @ApiPropertyOptional({ isArray: true, type: () => CurrentPriceDto })
+  currentPrices?: CurrentPriceDto[];
 }

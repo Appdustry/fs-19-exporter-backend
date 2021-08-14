@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PriceHistoryDto } from '../../price-histories/dto/price-history.dto';
+import { CurrentPriceDto } from '../../current-prices/dto/current-price.dto';
 
 export class FillTypeDto {
   @ApiProperty({ format: 'uuid' })
@@ -29,6 +29,6 @@ export class FillTypeDto {
   @ApiProperty({ type: 'integer', default: 0, minimum: 0 })
   currentLevel: number;
 
-  @ApiPropertyOptional({ isArray: true, type: () => PriceHistoryDto })
-  priceHistory?: PriceHistoryDto[];
+  @ApiPropertyOptional({ isArray: true, type: () => CurrentPriceDto })
+  currentPrices?: CurrentPriceDto[];
 }

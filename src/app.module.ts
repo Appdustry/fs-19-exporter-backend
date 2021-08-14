@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SavegamesModule } from './savegames/savegames.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExtractBearerTokenMiddleware } from './machineId.middleware';
+import { CurrentPricesModule } from './current-prices/current-prices.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ExtractBearerTokenMiddleware } from './machineId.middleware';
       }),
     }),
     SavegamesModule,
+    CurrentPricesModule,
   ],
 })
 export class AppModule implements NestModule {

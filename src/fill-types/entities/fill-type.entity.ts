@@ -6,7 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { PriceHistory } from '../../price-histories/entities/price-history.entity';
+import { CurrentPrice } from '../../current-prices/entities/current-price.entity';
 import { Savegame } from '../../savegames/entities/savegame.entity';
 
 @Entity()
@@ -45,10 +45,10 @@ export class FillType {
   @JoinColumn({ name: 'savegameId' })
   savegame: Savegame;
 
-  @OneToMany(() => PriceHistory, (history) => history.fillType, {
+  @OneToMany(() => CurrentPrice, (price) => price.fillType, {
     cascade: true,
     nullable: true,
     eager: true,
   })
-  priceHistory?: PriceHistory[];
+  currentPrices?: CurrentPrice[];
 }

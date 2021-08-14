@@ -46,5 +46,5 @@ export class CreateFillTypeDto {
   @ApiPropertyOptional({ type: CreatePriceHistoryDto, isArray: true })
   @IsOptional()
   @IsArray({ each: true })
-  priceHistory?: CreatePriceHistoryDto[];
+  currentPrice?: CreatePriceHistoryDto[];
 }

@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { PriceHistory } from '../../price-histories/entities/price-history.entity';
+import { CurrentPrice } from '../../current-prices/entities/current-price.entity';
 import { Savegame } from '../../savegames/entities/savegame.entity';
 
 @Entity()
@@ -22,6 +22,6 @@ export class SellStation {
   @ManyToOne(() => Savegame, (savegame) => savegame.sellStations)
   savegame?: Savegame;
 
-  @OneToMany(() => PriceHistory, (history) => history.sellStationId)
-  priceHistories?: PriceHistory[];
+  @OneToMany(() => CurrentPrice, (currentPrice) => currentPrice.sellStation)
+  currentPrices?: CurrentPrice[];
 }
