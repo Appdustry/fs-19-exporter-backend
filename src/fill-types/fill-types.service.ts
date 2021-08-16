@@ -65,7 +65,6 @@ export class FillTypesService {
       where: { fillTypeIndex, savegameId },
     });
     const currentPrices = fillType.currentPrices;
-    console.log('Setting low and high', fillType.name);
     for (const currentPrice of currentPrices) {
       if (!fillType.priceHigh) {
         fillType.priceHigh = currentPrice.currentPrice;
