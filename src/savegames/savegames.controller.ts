@@ -29,6 +29,9 @@ import { SellStationDto } from '../sell-stations/dto/sell-station.dto';
 import { CreateFillTypeDto } from '../fill-types/dto/create-fill-type.dto';
 import { CreateSellStationDto } from '../sell-stations/dto/create-sell-station.dto';
 import { CreatePriceHistoryDto } from '../price-histories/dto/create-price-history.dto';
+import { SetCurrentPriceDto } from '../current-prices/dto/set-current-price.dto';
+import { CurrentPricesService } from '../current-prices/current-prices.service';
+import { SetFillLevelDto } from '../fill-types/dto/set-fill-level.dto';
 
 @ApiTags('SaveGames')
 @Controller('savegames')
@@ -37,6 +40,7 @@ export class SavegamesController {
     private readonly savegamesService: SavegamesService,
     private readonly fillTypeService: FillTypesService,
     private readonly sellStationsService: SellStationsService,
+    private readonly currentPricesService: CurrentPricesService,
   ) {}
 
   @Post()
@@ -118,16 +122,36 @@ export class SavegamesController {
     return this.fillTypeService.createOne({ savegameId, ...data });
   }
 
-  // @Patch(':id/filltypes/index/:index/prices')
-  // pushFillTypePrice(
-  //   @Param('id') savegameId: string,
-  //   @Param('index') fillTypeIndex: string,
-  //   @Body() prices: CreatePriceHistoryDto[],
-  // ) {
-  //   return this.fillTypeService.pushPricesForType(
-  //     savegameId,
-  //     fillTypeIndex,
-  //     prices,
-  //   );
-  // }
+  @Patch(':id/filltypes/index/:index/prices')
+  async pushFillTypePrice(
+    @Param('id') savegameId: string,
+    @Param('index') fillTypeIndex: string,
+    @Body() prices: SetCurrentPriceDto[],
+  ) {
+    const res = await Promise.all(
+      prices.map((price) =>
+        this.currentPricesService.setCurrentPriceForType(
+          savegameId,
+          fillTypeIndex,
+          price,
+        ),
+      ),
+    );
+
+    await this.fillTypeService.setLowAndHigh(savegameId, +fillTypeIndex);
+    return res;
+  }
+
+  @Patch(':id/filltypes/index/:index/fillLevel')
+  setFillLevel(
+    @Param('id') savegameId: string,
+    @Param('index') fillTypeIndex: string,
+    @Body() fillLevel: SetFillLevelDto,
+  ) {
+    return this.fillTypeService.setFillLevelForType(
+      savegameId,
+      fillTypeIndex,
+      fillLevel.fillLevel,
+    );
+  }
 }

@@ -44,10 +44,15 @@ export class SavegamesService {
   }
 
   async findOneByInviteCode(inviteCode: string) {
-    const savegame = await this.repo.find({ where: { inviteCode } });
+    const savegame = await this.repo.findOne({ where: { inviteCode } });
     if (!savegame) {
       throw new NotFoundException();
     }
+
+    savegame.fillTypes = savegame.fillTypes.map((fillType) => {
+      fillType.currentPrices.sort((a, b) => b.currentPrice - a.currentPrice);
+      return fillType;
+    });
 
     return savegame;
   }

@@ -43,75 +43,43 @@ export class FillTypesService {
     return this.savegame.findOne(savegameId, { relations: ['fillTypes'] });
   }
 
-  // private async setPriceHistoryForType(
-  //   typeId: string,
-  //   priceHistory: CreatePriceHistoryDto[],
-  // ) {
-  //   const type = await this.repo.findOne(typeId, {
-  //     relations: ['priceHistory'],
-  //   });
-  //   if (!type) {
-  //     return;
-  //   }
-  //   const newEntries: CreatePriceHistoryDto[] = [];
-  //   for (const createHistory of priceHistory) {
-  //     if (
-  //       !type.priceHistory.find(
-  //         (exisiting) =>
-  //           exisiting.day === createHistory.day &&
-  //           exisiting.time === createHistory.time,
-  //       )
-  //     ) {
-  //       newEntries.push(createHistory);
-  //     }
-  //   }
-  //   newEntries.sort((a, b) => {
-  //     if (a.day - b.day !== 0) {
-  //       return a.day - b.day;
-  //     }
-  //     return a.time - b.time;
-  //   });
-  //   await this.priceHistory.save(newEntries);
-  // }
+  async setFillLevelForType(
+    savegameId: string,
+    fillTypeIndex: string,
+    fillLevel: number,
+  ) {
+    const fillType = await this.repo.findOne({
+      where: { fillTypeIndex, savegameId },
+    });
 
-  // public async pushPricesForType(
-  //   savegameId: string,
-  //   fillTypeIndex: string,
-  //   priceData: CreatePriceHistoryDto[],
-  // ) {
-  //   const fillType = await this.repo.findOne({
-  //     where: { savegameId, fillTypeIndex },
-  //   });
-  //   if (!fillType) {
-  //     throw new NotFoundException();
-  //   }
+    if (!fillType) {
+      throw new NotFoundException();
+    }
 
-  //   let lowOrHighChange = false;
-  //   let low = fillType.priceLow;
-  //   let high = fillType.priceHigh;
+    fillType.currentLevel = fillLevel;
+    return this.repo.save(fillType);
+  }
 
-  //   fillType.currentPrices = [];
+  public async setLowAndHigh(savegameId: string, fillTypeIndex: number) {
+    const fillType = await this.repo.findOne({
+      where: { fillTypeIndex, savegameId },
+    });
+    const currentPrices = fillType.currentPrices;
+    console.log('Setting low and high', fillType.name);
+    for (const currentPrice of currentPrices) {
+      if (!fillType.priceHigh) {
+        fillType.priceHigh = currentPrice.currentPrice;
+      }
+      if (!fillType.priceLow) {
+        fillType.priceLow = currentPrice.currentPrice;
+      }
+      if (currentPrice.currentPrice > fillType.priceHigh) {
+        fillType.priceHigh = currentPrice.currentPrice;
+      } else if (currentPrice.currentPrice < fillType.priceLow) {
+        fillType.priceLow = currentPrice.currentPrice;
+      }
+    }
 
-  //   for (const price of priceData) {
-  //     if (price.price < low) {
-  //       low = price.price;
-  //       lowOrHighChange = true;
-  //     } else if (price.price > high) {
-  //       high = price.price;
-  //       lowOrHighChange = true;
-  //     }
-  //     fillType.priceHistory.push(
-  //       await this.priceHistory.save({
-  //         fillTypeId: fillType.id,
-  //         ...price,
-  //       }),
-  //     );
-  //   }
-
-  //   if (lowOrHighChange) {
-  //     await this.repo.save({ id: fillType.id, priceHigh: high, priceLow: low });
-  //   }
-
-  //   return fillType.priceHistory;
-  // }
+    await this.repo.save(fillType);
+  }
 }

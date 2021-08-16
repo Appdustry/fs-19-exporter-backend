@@ -8,5 +8,6 @@ import { CurrentPrice } from './entities/current-price.entity';
 @Module({
   providers: [CurrentPricesService],
   imports: [TypeOrmModule.forFeature([FillType, CurrentPrice, Savegame])],
+  exports: [CurrentPricesService],
 })
 export class CurrentPricesModule {}
